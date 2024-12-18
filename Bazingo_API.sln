@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bazingo_API", "Bazingo_API\Bazingo_API.csproj", "{E754A6F0-7858-484C-B387-B94376B929D4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bazingo_Core", "Bazingo_Core\Bazingo_Core.csproj", "{3627FA6F-280E-4AA2-937A-548401B7C5A8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bazingo_Infrastructure", "Bazingo_Infrastructure\Bazingo_Infrastructure.csproj", "{A0A99255-F8B0-4C46-85AC-FA061B16254A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bazingo_Application", "Bazingo_Application\Bazingo_Application.csproj", "{71B3B84C-9906-43F0-B1E4-518FE58A6345}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E754A6F0-7858-484C-B387-B94376B929D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E754A6F0-7858-484C-B387-B94376B929D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E754A6F0-7858-484C-B387-B94376B929D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E754A6F0-7858-484C-B387-B94376B929D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3627FA6F-280E-4AA2-937A-548401B7C5A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3627FA6F-280E-4AA2-937A-548401B7C5A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3627FA6F-280E-4AA2-937A-548401B7C5A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3627FA6F-280E-4AA2-937A-548401B7C5A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0A99255-F8B0-4C46-85AC-FA061B16254A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0A99255-F8B0-4C46-85AC-FA061B16254A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0A99255-F8B0-4C46-85AC-FA061B16254A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0A99255-F8B0-4C46-85AC-FA061B16254A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71B3B84C-9906-43F0-B1E4-518FE58A6345}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71B3B84C-9906-43F0-B1E4-518FE58A6345}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71B3B84C-9906-43F0-B1E4-518FE58A6345}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71B3B84C-9906-43F0-B1E4-518FE58A6345}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {39AA36E1-68FD-44D4-AFD0-CC989E5897A9}
+	EndGlobalSection
+EndGlobal
