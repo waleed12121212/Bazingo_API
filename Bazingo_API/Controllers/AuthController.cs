@@ -15,6 +15,7 @@ namespace Bazingo_API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
+<<<<<<< HEAD
         private readonly IConfiguration _configuration;
 
         public AuthController(UserManager<User> userManager , IConfiguration configuration)
@@ -23,6 +24,19 @@ namespace Bazingo_API.Controllers
             _configuration = configuration;
         }
 
+=======
+        private readonly SignInManager<User> _signInManager;
+        private readonly IConfiguration _configuration;
+
+        public AuthController(UserManager<User> userManager , SignInManager<User> signInManager , IConfiguration configuration)
+        {
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _configuration = configuration;
+        }
+
+        // 1. تسجيل مستخدم جديد
+>>>>>>> 9cc7e76c9d962376c2daf0a9dd2900b640628596
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterModel model)
         {
@@ -36,7 +50,10 @@ namespace Bazingo_API.Controllers
                 Email = model.Email ,
                 UserName = model.Username ,
                 PhoneNumber = model.PhoneNumber ,
+<<<<<<< HEAD
                 UserType = model.UserType ?? "Buyer" ,
+=======
+>>>>>>> 9cc7e76c9d962376c2daf0a9dd2900b640628596
                 CreatedAt = DateTime.UtcNow ,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -45,6 +62,7 @@ namespace Bazingo_API.Controllers
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
 
+<<<<<<< HEAD
             return Ok(new { message = "User registered successfully!" });
         }
 
@@ -148,18 +166,87 @@ namespace Bazingo_API.Controllers
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+=======
+            return Ok(new { Message = "User registered successfully!" });
+        }
+
+        // 2. تسجيل الدخول وإرجاع JWT
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        {
+            var user = await _userManager.FindByNameAsync(model.UserName);
+            if (user == null)
+                return Unauthorized("Invalid username or password!");
+
+            var result = await _signInManager.CheckPasswordSignInAsync(user , model.Password , false);
+            if (!result.Succeeded)
+                return Unauthorized("Invalid username or password!");
+
+            var token = GenerateJwtToken(user);
+            return Ok(new { Token = token });
+        }
+
+        // 3. تحديث كلمة المرور
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel model)
+        {
+            var user = await _userManager.FindByNameAsync(model.UserName);
+            if (user == null)
+                return NotFound("User not found!");
+
+            var result = await _userManager.ChangePasswordAsync(user , model.CurrentPassword , model.NewPassword);
+            if (result.Succeeded)
+                return Ok(new { Message = "Password updated successfully!" });
+
+            return BadRequest(result.Errors);
+        }
+
+        // 4. إرجاع بيانات المستخدم الحالي
+        [HttpGet("current-user")]
+        public async Task<IActionResult> GetCurrentUser( )
+        {
+            var userName = User?.Identity?.Name;
+            if (string.IsNullOrEmpty(userName))
+                return Unauthorized("User not logged in!");
+
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null)
+                return NotFound("User not found!");
+
+            return Ok(new { user.UserName , user.Email });
+        }
+
+        // توليد الـ JWT
+        private string GenerateJwtToken(User user)
+        {
+            var jwtKey = _configuration["Jwt:Key"];
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Email, user.Email)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+>>>>>>> 9cc7e76c9d962376c2daf0a9dd2900b640628596
             var creds = new SigningCredentials(key , SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"] ,
                 audience: _configuration["Jwt:Audience"] ,
                 claims: claims ,
+<<<<<<< HEAD
                 expires: DateTime.UtcNow.AddHours(int.Parse(_configuration["Jwt:ExpireHours"])) ,
+=======
+                expires: DateTime.Now.AddHours(1) ,
+>>>>>>> 9cc7e76c9d962376c2daf0a9dd2900b640628596
                 signingCredentials: creds
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+<<<<<<< HEAD
 
 
     }
@@ -179,10 +266,36 @@ namespace Bazingo_API.Controllers
         public string Password { get; set; }
         public string? PhoneNumber { get; set; }
         public string? UserType { get; set; }
+=======
+    }
+
+    // موديلات المساعدة
+    public class RegisterModel
+    {
+        [Required(ErrorMessage = "First name is required")]
+        public string FirstName { get; set; }
+
+        [Required(ErrorMessage = "Last name is required")]
+        public string LastName { get; set; }
+
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email address")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Username is required")]
+        public string Username { get; set; }
+
+        [Required(ErrorMessage = "Password is required")]
+        [MinLength(6 , ErrorMessage = "Password must be at least 6 characters long")]
+        public string Password { get; set; }
+
+        public string? PhoneNumber { get; set; }
+>>>>>>> 9cc7e76c9d962376c2daf0a9dd2900b640628596
     }
 
     public class LoginModel
     {
+<<<<<<< HEAD
         [Required]
         [EmailAddress]
         public string Email { get; set; }
@@ -194,6 +307,16 @@ namespace Bazingo_API.Controllers
         [Required]
         public string CurrentPassword { get; set; }
         [Required]
+=======
+        public string UserName { get; set; }
+        public string Password { get; set; }
+    }
+
+    public class ChangePasswordModel
+    {
+        public string UserName { get; set; }
+        public string CurrentPassword { get; set; }
+>>>>>>> 9cc7e76c9d962376c2daf0a9dd2900b640628596
         public string NewPassword { get; set; }
     }
 }

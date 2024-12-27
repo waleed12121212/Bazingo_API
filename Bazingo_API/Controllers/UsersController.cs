@@ -11,7 +11,11 @@ namespace Bazingo_API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+<<<<<<< HEAD
     //[Authorize] // حماية الـ Endpoints
+=======
+    [Authorize] // حماية الـ Endpoints
+>>>>>>> 9cc7e76c9d962376c2daf0a9dd2900b640628596
     public class UsersController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
