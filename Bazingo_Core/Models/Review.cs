@@ -9,23 +9,14 @@ namespace Bazingo_Core.Models
 {
     public class Review
     {
-        [Key]
         public int ReviewID { get; set; }
-
-        [Required]
         public int ProductID { get; set; }
-        public Product Product { get; set; }
-
-        [Required]
         public string UserID { get; set; }
-        public User User { get; set; }
-
-        [Required]
-        [Range(1 , 5)]
-        public int Rating { get; set; }
-
+        public int Rating { get; set; } // 1 to 5
         public string Comment { get; set; }
-
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public virtual Product Product { get; set; }
+        public virtual AppUser User { get; set; }
     }
 }

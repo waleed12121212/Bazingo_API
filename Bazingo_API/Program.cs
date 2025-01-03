@@ -1,29 +1,16 @@
-<<<<<<< HEAD
-﻿using Bazingo_Application.Mapping_Profiles;
-using Bazingo_Core.Models;
-using Bazingo_Infrastructure;
-using Bazingo_Infrastructure.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-
-=======
-﻿
-using Bazingo_Application.Mapping_Profiles;
-using Bazingo_Core.Models;
-using Bazingo_Infrastructure;
 using Bazingo_Infrastructure.Data;
-using Microsoft.AspNetCore.Authentication.JwtBearer;  // Add this line
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using Bazingo_Infrastructure.Identity;
+using Bazingo_Core.Models;
+using Bazingo_Application.Mapping_Profiles;
+using Bazingo_Core.Domain_Logic.Interfaces;
+using Bazingo_Infrastructure.Repositories;
+using Bazingo_Infrastructure.Services;
 
-
->>>>>>> 9cc7e76c9d962376c2daf0a9dd2900b640628596
 namespace Bazingo_API
 {
     public class Program
@@ -32,168 +19,91 @@ namespace Bazingo_API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-<<<<<<< HEAD
-            // قراءة إعدادات JWT من AppSettings
-            var jwtSettings = builder.Configuration.GetSection("Jwt");
-            var jwtKey = jwtSettings["Key"];
-            var jwtIssuer = jwtSettings["Issuer"];
-            var jwtAudience = jwtSettings["Audience"];
+            // ✅ تهيئة Serilog
+            builder.Host.UseSerilog((context , config) =>
+            {
+                config.ReadFrom.Configuration(context.Configuration);
+            });
 
-            // إضافة الخدمات
-            builder.Services.AddControllers();
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            // ✅ تسجيل Mapster
+            MappingProfile.ConfigureMappings();
 
-            // إعداد قاعدة البيانات
+            // ✅ تسجيل DbContexts
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("DefaultConnection") ,
-                    b => b.MigrationsAssembly("Bazingo_Infrastructure")
-                ));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationDbConnection")));
 
-            // إعداد الهوية
-=======
-            var jwtSettings = builder.Configuration.GetSection("Jwt");
-            var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+            builder.Services.AddDbContext<AppIdentityDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityDbConnection")));
 
+            // ✅ تسجيل Identity
+            builder.Services.AddIdentity<AppUser , IdentityRole>()
+                .AddEntityFrameworkStores<AppIdentityDbContext>()
+                .AddDefaultTokenProviders();
 
-
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-
-            builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("DefaultConnection"));
-
->>>>>>> 9cc7e76c9d962376c2daf0a9dd2900b640628596
-            builder.Services.AddIdentity<User , IdentityRole>(options =>
-            {
-                options.Password.RequireDigit = true;
-                options.Password.RequiredLength = 8;
-                options.Password.RequireNonAlphanumeric = true;
-                options.Password.RequireUppercase = true;
-                options.Password.RequireLowercase = true;
-<<<<<<< HEAD
-                options.User.RequireUniqueEmail = true;
-            })
-            .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddDefaultTokenProviders();
-
-            // إعداد المصادقة باستخدام JWT
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
-=======
-
-                options.User.RequireUniqueEmail = true;
-            })
-             .AddEntityFrameworkStores<ApplicationDbContext>()
-             .AddDefaultTokenProviders();
-
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAll" ,
-                    policy => policy.AllowAnyOrigin()
-                                    .AllowAnyHeader()
-                                    .AllowAnyMethod());
-            });
-
-            var jwtKey = "YourSuperSecretKey12345!"; // مفتاح JWT السري
->>>>>>> 9cc7e76c9d962376c2daf0a9dd2900b640628596
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-<<<<<<< HEAD
-            })
-            .AddJwtBearer(options =>
-=======
-            }).AddJwtBearer(options =>
->>>>>>> 9cc7e76c9d962376c2daf0a9dd2900b640628596
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
+            // ✅ تهيئة JWT Authentication
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
                 {
-                    ValidateIssuer = true ,
-                    ValidateAudience = true ,
-                    ValidateLifetime = true ,
-                    ValidateIssuerSigningKey = true ,
-<<<<<<< HEAD
-                    ValidIssuer = jwtIssuer ,
-                    ValidAudience = jwtAudience ,
-                    IssuerSigningKey = key ,
-                    ClockSkew = TimeSpan.Zero // للتأكد من عدم السماح بفروقات زمنية
-                };
-
-                options.Events = new JwtBearerEvents
-                {
-                    OnAuthenticationFailed = context =>
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        Console.WriteLine($"Authentication failed: {context.Exception.Message}");
-                        return Task.CompletedTask;
-                    } ,
-                    OnTokenValidated = context =>
-                    {
-                        Console.WriteLine("Token validated successfully");
-                        return Task.CompletedTask;
-                    }
-                };
-            });
+                        ValidateIssuer = true ,
+                        ValidateAudience = true ,
+                        ValidateLifetime = true ,
+                        ValidateIssuerSigningKey = true ,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"] ,
+                        ValidAudience = builder.Configuration["Jwt:Audience"] ,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                    };
+                });
 
-            // إعداد CORS
+            // ✅ تهيئة Authorization
+            builder.Services.AddAuthorization();
+
+            // ✅ تفعيل CORS
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll" , policy =>
-                    policy.AllowAnyOrigin()
-                          .AllowAnyHeader()
-                          .AllowAnyMethod());
+                    policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             });
+
+            // ✅ تسجيل Repositories و UnitOfWork
+            builder.Services.AddScoped<IUnitOfWork , UnitOfWork>();
+            builder.Services.AddScoped<IProductRepository , ProductRepository>();
+            builder.Services.AddScoped<IOrderRepository , OrderRepository>();
+
+            // ✅ تسجيل Services
+            builder.Services.AddScoped<IUserService , UserService>();
+            builder.Services.AddScoped<IProductService , ProductService>();
+            builder.Services.AddScoped<IOrderService , OrderService>();
+            builder.Services.AddScoped<IReviewService , ReviewService>();
+            builder.Services.AddScoped<IComplaintService , ComplaintService>();
+            builder.Services.AddScoped<ICartService , CartService>();
+            builder.Services.AddScoped<IAuctionService , AuctionService>();
+            builder.Services.AddScoped<IPaymentService , PaymentService>();
+
+            // ✅ تسجيل الـ Controllers + Fluent Validation
+            builder.Services.AddControllers().AddFluentValidation(fv =>
+                fv.RegisterValidatorsFromAssemblyContaining<Program>());
+
+            // ✅ إضافة Swagger
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            // تهيئة التطبيق
-            app.UseCors("AllowAll");
-=======
-                    ValidIssuer = "YourApp" ,
-                    ValidAudience = "YourApp" ,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
-                };
-            });
-
-
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("DefaultConnection") ,
-                    b => b.MigrationsAssembly("Bazingo_Infrastructure")
-                ));
-
-
-            var app = builder.Build();
-
-            app.UseCors("AllowAll");
-            // Configure the HTTP request pipeline.
->>>>>>> 9cc7e76c9d962376c2daf0a9dd2900b640628596
+            // ✅ تفعيل Middleware
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
-<<<<<<< HEAD
-            app.UseRouting();
+            app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseAuthorization();
-            app.MapControllers();
-            ProductMappingProfile.RegisterMappings();
-=======
-
-            app.UseRouting();
-            app.UseAuthorization();
-
-
+            app.UseSerilogRequestLogging();
             app.MapControllers();
 
-            ProductMappingProfile.RegisterMappings();
-
->>>>>>> 9cc7e76c9d962376c2daf0a9dd2900b640628596
             app.Run();
         }
     }

@@ -9,18 +9,11 @@ namespace Bazingo_Core.Models
 {
     public class Zone
     {
-        [Key]
         public int ZoneID { get; set; }
-
-        [Required]
-        [MaxLength(100)]
         public string ZoneName { get; set; }
-
-        [Required]
         public int CityID { get; set; }
-        public City City { get; set; }
 
-        // Relationships
-        public ICollection<Shipping> Shippings { get; set; }
+        public virtual City City { get; set; }
+        public virtual ICollection<Shipping> Shippings { get; set; }
     }
 }

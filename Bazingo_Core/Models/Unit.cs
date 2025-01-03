@@ -17,6 +17,6 @@ namespace Bazingo_Core.Models
         public string Name { get; set; }
 
         // Relationships
-        public ICollection<ItemsUnit> ItemUnits { get; set; }
+        public ICollection<ItemUnit> ItemUnits { get; set; }
     }
 }

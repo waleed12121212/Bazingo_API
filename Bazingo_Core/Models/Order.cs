@@ -9,30 +9,18 @@ namespace Bazingo_Core.Models
 {
     public class Order
     {
-        [Key]
         public int OrderID { get; set; }
-
-        [Required]
         public string BuyerID { get; set; }
-        public User Buyer { get; set; }
-
-        [Required]
-        [MaxLength(50)]
         public string Status { get; set; } // Pending, Shipped, Completed, Canceled
-
-        [Required]
-        [Range(0.01 , double.MaxValue)]
         public decimal TotalAmount { get; set; }
-
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        // Relationships
-        public ICollection<OrderDetail> OrderDetails { get; set; }
-        public Payment Payment { get; set; }
-        public Shipping Shipping { get; set; }
-        public ICollection<Complaint> Complaints { get; set; }
-        public Escrow Escrow { get; set; }
+        public virtual AppUser Buyer { get; set; }
+        public virtual ICollection<OrderDetail> OrderDetails { get; set; }
+        public virtual Payment Payment { get; set; }
+        public virtual Shipping Shipping { get; set; }
+        public virtual ICollection<Complaint> Complaints { get; set; }
+        public virtual Escrow Escrow { get; set; }
     }
 }

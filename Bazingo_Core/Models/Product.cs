@@ -9,42 +9,26 @@ namespace Bazingo_Core.Models
 {
     public class Product
     {
-        [Key]
         public int ProductID { get; set; }
-
-        [Required]
-        [MaxLength(100)]
+        public int BaseCurrencyID { get; set; }
+        public string SellerID { get; set; }
+        public int CategoryID { get; set; }
         public string ProductName { get; set; }
-
         public string Description { get; set; }
-
-        [Required]
-        [Range(0.01 , double.MaxValue)]
         public decimal Price { get; set; }
-
-        [Required]
-        [Range(0 , int.MaxValue)]
         public int Quantity { get; set; }
-
         public string Images { get; set; } // JSON Array
-
         public string VideoURL { get; set; }
-
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        // Relationships
-        [Required]
-        public string SellerID { get; set; }
-        public User Seller { get; set; }
-
-        [Required]
-        public int CategoryID { get; set; }
-        public Category Category { get; set; }
-
-        public ICollection<Review> Reviews { get; set; }
-        public ICollection<OrderDetail> OrderDetails { get; set; }
-        public Auction Auction { get; set; }
+        public virtual AppUser Seller { get; set; }
+        public virtual Category Category { get; set; }
+        public virtual ICollection<Review> Reviews { get; set; }
+        public virtual ICollection<OrderDetail> OrderDetails { get; set; }
+        public virtual Auction Auction { get; set; }
+        public virtual ICollection<ShoppingCartItem> ShoppingCartItems { get; set; }
+        public virtual ICollection<PriceHistory> PriceHistories { get; set; }
+        public virtual ICollection<ItemUnit> ItemUnits { get; set; }
     }
 }
